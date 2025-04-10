@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: desafio-pantore-deployment
+  namespace: desafio-pantore
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: desafio-pantore
+  template:
+    metadata:
+      labels:
+        app: desafio-pantore
+    spec:
+      containers:
+      - name: app
+        image: matheusjustino/desafio-pantore:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        env:
+          - name: PORT
+            valueFrom:
+              configMapKeyRef:
+                name: desafio-pantore-envs
+                key: PORT
+          - name: DATABASE_URL
+            valueFrom:
+              configMapKeyRef:
+                name: desafio-pantore-envs
+                key: DATABASE_URL
+          - name: JWT_SECRET
+            valueFrom:
+              configMapKeyRef:
+                name: desafio-pantore-envs
+                key: JWT_SECRET

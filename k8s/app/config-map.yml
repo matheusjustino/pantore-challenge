@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: desafio-pantore-envs
+  namespace: desafio-pantore
+data:
+  PORT: "8080"
+  DATABASE_URL: "postgresql://postgres:docker@desafio-pantore-db-svc:5432/pantore-db?schema=public"
+  JWT_SECRET: "logindobatman"

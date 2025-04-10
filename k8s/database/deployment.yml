@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: desafio-pantore-db-deployment
+  namespace: desafio-pantore
+spec:
+  selector:
+    matchLabels:
+      app: desafio-pantore-db
+  template:
+    metadata:
+      labels:
+        app: desafio-pantore-db
+    spec:
+      containers:
+      - name: database
+        image: postgres:14.4-alpine
+        ports:
+            - containerPort: 5432
+        env:
+          - name: POSTGRES_USER
+            valueFrom:
+              configMapKeyRef:
+                name: desafio-pantore-db-envs
+                key: POSTGRES_USER
+          - name: POSTGRES_PASSWORD
+            valueFrom:
+              configMapKeyRef:
+                name: desafio-pantore-db-envs
+                key: POSTGRES_PASSWORD
+          - name: POSTGRES_DB
+            valueFrom:
+              configMapKeyRef:
+                name: desafio-pantore-db-envs
+                key: POSTGRES_DB
