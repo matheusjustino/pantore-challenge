@@ -16,13 +16,19 @@ export class PrismaService
 	public async onModuleInit(): Promise<void> {
 		await this.$connect();
 		this.$use(async (params, next) => {
-			if (params.action === 'create' && params.model === 'User') {
+			if (
+				(params.action === 'create' || params.action === 'update') &&
+				params.model === 'User'
+			) {
 				const user = params.args.data as User;
-				const salt = await genSalt(12);
-				const hashedPass = await hash(user.password, salt);
 
-				user.password = hashedPass;
-				params.args.data = user;
+				if (user.password) {
+					const salt = await genSalt(12);
+					const hashedPass = await hash(user.password, salt);
+
+					user.password = hashedPass;
+					params.args.data = user;
+				}
 			}
 
 			return next(params);

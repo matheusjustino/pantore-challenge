@@ -1,4 +1,5 @@
 import {
+	BadRequestException,
 	Body,
 	Controller,
 	Delete,
@@ -10,7 +11,12 @@ import {
 	UseGuards,
 } from '@nestjs/common';
 import { Role } from '@prisma/client';
-import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+	ApiBearerAuth,
+	ApiOkResponse,
+	ApiOperation,
+	ApiTags,
+} from '@nestjs/swagger';
 
 // GUARDS
 import { JwtGuard } from '../auth/guards/jwt.guard';
@@ -67,6 +73,10 @@ export class UserController {
 		return this.userService.getUserById(userId);
 	}
 
+	@ApiOperation({
+		summary: 'ADMIN - Update a user',
+		description: 'Only users with the ADMIN role can access this endpoint.',
+	})
 	@ApiOkResponse({
 		type: UserDTO,
 		description: 'User updated successfully',
@@ -81,6 +91,10 @@ export class UserController {
 		return this.userService.updateUser(userId, payload);
 	}
 
+	@ApiOperation({
+		summary: 'ADMIN - Delete a user',
+		description: 'Only users with the ADMIN role can access this endpoint.',
+	})
 	@ApiOkResponse({
 		type: UserDTO,
 		description: 'User deleted successfully',
@@ -88,7 +102,14 @@ export class UserController {
 	@UseGuards(RolesGuard)
 	@Roles(Role.ADMIN)
 	@Delete(':id')
-	public async deleteUser(@Param('id') userId: string) {
+	public async deleteUser(
+		@CurrentUser() { id, role }: IUserRequest,
+		@Param('id') userId: string,
+	) {
+		if (role === Role.ADMIN && id === userId) {
+			throw new BadRequestException('Cannot delete an admin user');
+		}
+
 		return this.userService.deleteUser(userId);
 	}
 }
