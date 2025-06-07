@@ -11,27 +11,6 @@ env:
   ECS_BACKEND_SERVICE: ${{ vars.ECS_BACKEND_SERVICE }}
 
 jobs:
-  # build:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout Repository
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Node
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: 22.x
-  #         cache: 'yarn'
-
-  #     - name: Install dependencies
-  #       run: yarn install --frozen-lockfile
-
-  #     - name: Formatting
-  #       run: yarn format
-
-  #     - name: Build
-  #       run: yarn build
-
   deploy:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -58,7 +37,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./
-          platforms: linux/arm64
+          platforms: linux/amd64
           push: true
           tags: |
             ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND_IMAGE }}:latest
